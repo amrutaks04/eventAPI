@@ -16,37 +16,6 @@ const eventSchema = new mongoose.Schema({
   imageUrl: String,
 });
 
-const Event = mongoose.model("Event", eventSchema);
+const Event = mongoose.model("Event", eventSchema); 
 
-const eventDescriptionSchema = new mongoose.Schema({
-  event: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Event",
-    required: true,
-  },
-  imageUrl: String,
-  time: {
-    type: String,
-    required: true,
-  },
-  mode: {
-    type: String,
-    enum: ["offline", "online"],
-    required: true,
-  },
-  about: {
-    type: String,
-    required: true,
-  },
-  termsAndConditions: {
-    type: String,
-    required: true,
-  },
-});
-
-const EventDescription = mongoose.model("EventDescription", eventDescriptionSchema);
-
-module.exports = {
-  Event,
-  EventDescription
-};
+module.exports = Event;
