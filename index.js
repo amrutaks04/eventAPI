@@ -91,13 +91,14 @@ app.post('/add-eventdes', async function (request, response) {
         });
     }
 });
+
 app.get('/eventdes/:id', async function (request, response) {
     try {
-        const id = request.params.id.trim(); 
-        console.log(`Fetching event with ID: ${id}`);
+        const id = request.params.id.trim(); // Trim the ID to remove any extra whitespace or newline characters
+        console.log(`Fetching event with ID: ${id}`); // Debugging log
         const event = await Eventdes.findById(id);
         if (!event) {
-            console.log(`Event with ID ${id} not found`); 
+            console.log(`Event with ID ${id} not found`); // Log if event not found
             return response.status(404).json({
                 status: 'failure',
                 message: 'Event not found'
