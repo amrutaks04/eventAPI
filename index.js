@@ -63,7 +63,6 @@ app.get('/req-event', async function (request, response) {
         });
     }
 });
-
 app.post('/add-eventdes', async function (request, response) {
     try {
         const newEventDes = await Eventdes.create({
@@ -92,6 +91,7 @@ app.post('/add-eventdes', async function (request, response) {
     }
 });
 
+// Route to get a detailed event by ID
 app.get('/eventdes/:id', async function (request, response) {
     try {
         const event = await Eventdes.findById(request.params.id);
