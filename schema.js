@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const eventSchema = new mongoose.Schema({
   title: {
@@ -14,8 +14,12 @@ const eventSchema = new mongoose.Schema({
     required: true,
   },
   imageUrl: String,
+  detailedEventId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Eventdes', // Reference to the Eventdes model
+  },
 });
 
-const Event = mongoose.model("Event", eventSchema); 
+const Event = mongoose.model('Event', eventSchema);
 
 module.exports = Event;

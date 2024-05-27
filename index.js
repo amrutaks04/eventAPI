@@ -10,17 +10,17 @@ app.use(bodyParser.json());
 app.use(cors());
 
 async function connectToDb() {
-  try {
-    await mongoose.connect('mongodb+srv://amruta:vieFC9VXxVSgoPzM@cluster0.rgbuaxs.mongodb.net/EventManagement?retryWrites=true&w=majority&appName=Cluster0');
-    console.log('DB Connection established');
-    const port = process.env.PORT || 8002;
-    app.listen(port, function() {
-        console.log(`Listening on port ${port}`);
-    });
-  } catch (error) {
-    console.log(error);
-    console.log("Couldn't establish connection");
-  }
+    try {
+        await mongoose.connect('mongodb+srv://amruta:vieFC9VXxVSgoPzM@cluster0.rgbuaxs.mongodb.net/EventManagement?retryWrites=true&w=majority&appName=Cluster0');
+        console.log('DB Connection established');
+        const port = process.env.PORT || 8002;
+        app.listen(port, function() {
+            console.log(`Listening on port ${port}`);
+        });
+    } catch (error) {
+        console.log(error);
+        console.log("Couldn't establish connection");
+    }
 }
 
 connectToDb();
@@ -31,7 +31,8 @@ app.post('/add-event', async function (request, response) {
             title: request.body.title,
             category: request.body.category,
             date: request.body.date,
-            imageUrl: request.body.imageUrl
+            imageUrl: request.body.imageUrl,
+            detailedEventId: request.body.detailedEventId // Include detailedEventId
         });
         response.status(201).json({
             status: 'success',
@@ -106,7 +107,7 @@ app.get('/eventdes/:id', async function (request, response) {
             });
         }
 
-        const event = await Eventdes.findById(id);
+        const event = await Event.findById(id).populate('detailedEventId');
         if (!event) {
             console.log(`Event with ID ${id} not found`); // Log if event not found
             return response.status(404).json({
@@ -114,7 +115,7 @@ app.get('/eventdes/:id', async function (request, response) {
                 message: 'Event not found'
             });
         }
-        response.status(200).json(event);
+        response.status(200).json(event.detailedEventId);
     } catch (error) {
         console.error(`Error fetching event with ID ${id}:`, error);
         response.status(500).json({
@@ -124,7 +125,5 @@ app.get('/eventdes/:id', async function (request, response) {
         });
     }
 });
-
-
 
 module.exports = app;
