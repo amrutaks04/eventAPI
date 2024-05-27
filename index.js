@@ -93,9 +93,11 @@ app.post('/add-eventdes', async function (request, response) {
 });
 app.get('/eventdes/:id', async function (request, response) {
     try {
-        const id = request.params.id.trim(); // Trim the ID to remove any extra whitespace or newline characters
+        const id = request.params.id.trim(); 
+        console.log(`Fetching event with ID: ${id}`);
         const event = await Eventdes.findById(id);
         if (!event) {
+            console.log(`Event with ID ${id} not found`); 
             return response.status(404).json({
                 status: 'failure',
                 message: 'Event not found'
@@ -103,7 +105,7 @@ app.get('/eventdes/:id', async function (request, response) {
         }
         response.status(200).json(event);
     } catch (error) {
-        console.error('Error fetching event:', error);
+        console.error(`Error fetching event with ID ${id}:`, error);
         response.status(500).json({
             status: 'failure',
             message: 'Failed to fetch event',
@@ -111,6 +113,7 @@ app.get('/eventdes/:id', async function (request, response) {
         });
     }
 });
+
 
 
 module.exports = app;
