@@ -96,6 +96,16 @@ app.get('/eventdes/:id', async function (request, response) {
     try {
         const id = request.params.id.trim(); // Trim the ID to remove any extra whitespace or newline characters
         console.log(`Fetching event with ID: ${id}`); // Debugging log
+        
+        // Check if the ID is valid ObjectId
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            console.error(`Invalid ObjectId: ${id}`);
+            return response.status(400).json({
+                status: 'failure',
+                message: 'Invalid Event ID'
+            });
+        }
+
         const event = await Eventdes.findById(id);
         if (!event) {
             console.log(`Event with ID ${id} not found`); // Log if event not found
