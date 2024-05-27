@@ -115,9 +115,10 @@ app.get('/eventdes/:id', async function (request, response) {
                 message: 'Event not found'
             });
         }
-        response.status(200).json(event.detailedEventId);
+
+        response.status(200).json(event); // Return the populated event object
     } catch (error) {
-        console.error(`Error fetching event with ID ${id}:`, error);
+        console.error(`Error fetching event with ID ${request.params.id}:`, error); // Log the error
         response.status(500).json({
             status: 'failure',
             message: 'Failed to fetch event',
@@ -125,5 +126,6 @@ app.get('/eventdes/:id', async function (request, response) {
         });
     }
 });
+
 
 module.exports = app;
