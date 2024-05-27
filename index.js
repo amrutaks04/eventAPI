@@ -95,8 +95,8 @@ app.post('/add-eventdes', async function (request, response) {
 
 app.get('/eventdes/:id', async function (request, response) {
     try {
-        const id = request.params.id.trim(); // Trim the ID to remove any extra whitespace or newline characters
-        console.log(`Fetching event description with ID: ${id}`); // Debugging log
+        const id = request.params.id.trim(); 
+        console.log(`Fetching event description with ID: ${id}`); 
         
         // Check if the ID is valid ObjectId
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -109,7 +109,7 @@ app.get('/eventdes/:id', async function (request, response) {
 
         const eventDes = await Eventdes.findById(id);
         if (!eventDes) {
-            console.log(`Event description with ID ${id} not found`); // Log if event description not found
+            console.log(`Event description with ID ${id} not found`); 
             return response.status(404).json({
                 status: 'failure',
                 message: 'Event description not found'
