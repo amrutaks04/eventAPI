@@ -96,36 +96,36 @@ app.post('/add-eventdes', async function (request, response) {
 app.get('/eventdes/:id', async function (request, response) {
     try {
         const id = request.params.id.trim(); // Trim the ID to remove any extra whitespace or newline characters
-        console.log(`Fetching event with ID: ${id}`); // Debugging log
+        console.log(`Fetching event description with ID: ${id}`); // Debugging log
         
         // Check if the ID is valid ObjectId
         if (!mongoose.Types.ObjectId.isValid(id)) {
             console.error(`Invalid ObjectId: ${id}`);
             return response.status(400).json({
                 status: 'failure',
-                message: 'Invalid Event ID'
+                message: 'Invalid Event Description ID'
             });
         }
 
-        const event = await Event.findById(id).populate('detailedEventId');
-        if (!event) {
-            console.log(`Event with ID ${id} not found`); // Log if event not found
+        const eventDes = await Eventdes.findById(id);
+        if (!eventDes) {
+            console.log(`Event description with ID ${id} not found`); // Log if event description not found
             return response.status(404).json({
                 status: 'failure',
-                message: 'Event not found'
+                message: 'Event description not found'
             });
         }
-
-        response.status(200).json(event); // Return the populated event object
+        response.status(200).json(eventDes);
     } catch (error) {
-        console.error(`Error fetching event with ID ${request.params.id}:`, error); // Log the error
+        console.error(`Error fetching event description with ID ${id}:`, error);
         response.status(500).json({
             status: 'failure',
-            message: 'Failed to fetch event',
+            message: 'Failed to fetch event description',
             error: error.message
         });
     }
 });
+
 
 
 module.exports = app;
