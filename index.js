@@ -91,10 +91,10 @@ app.post('/add-eventdes', async function (request, response) {
         });
     }
 });
-
 app.get('/eventdes/:id', async function (request, response) {
     try {
-        const event = await Eventdes.findById(request.params.id);
+        const id = request.params.id.trim(); // Trim the ID to remove any extra whitespace or newline characters
+        const event = await Eventdes.findById(id);
         if (!event) {
             return response.status(404).json({
                 status: 'failure',
@@ -111,5 +111,6 @@ app.get('/eventdes/:id', async function (request, response) {
         });
     }
 });
+
 
 module.exports = app;
