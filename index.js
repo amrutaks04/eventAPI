@@ -32,7 +32,7 @@ app.post('/add-event', async function (request, response) {
             category: request.body.category,
             date: request.body.date,
             imageUrl: request.body.imageUrl,
-            detailedEventId: request.body.detailedEventId // Include detailedEventId
+            detailedEventId: request.body.detailedEventId 
         });
         response.status(201).json({
             status: 'success',
@@ -67,7 +67,7 @@ app.post('/add-event', async function (request, response) {
 app.get('/req-event', async function (request, response) {
     try {
         const { category } = request.query;
-        const query = category ? { category } : {}; // Adjust query based on the presence of category
+        const query = category ? { category } : {}; 
         const events = await Event.find(query).populate('detailedEventId');
         response.status(200).json(events);
     } catch (error) {
@@ -114,7 +114,6 @@ app.get('/eventdes/:id', async function (request, response) {
         const id = request.params.id.trim(); 
         console.log(`Fetching event description with ID: ${id}`); 
         
-        // Check if the ID is valid ObjectId
         if (!mongoose.Types.ObjectId.isValid(id)) {
             console.error(`Invalid ObjectId: ${id}`);
             return response.status(400).json({
