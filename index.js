@@ -49,11 +49,26 @@ app.post('/add-event', async function (request, response) {
     }
 });
 
+// app.get('/req-event', async function (request, response) {
+//     try {
+//         const { category } = request.query;
+//         const query = category ? { category } : {};
+//         const events = await Event.find(query);
+//         response.status(200).json(events);
+//     } catch (error) {
+//         console.error('Error fetching events:', error);
+//         response.status(500).json({
+//             status: 'failure',
+//             message: 'Failed to fetch events',
+//             error: error.message
+//         });
+//     }
+// });
 app.get('/req-event', async function (request, response) {
     try {
         const { category } = request.query;
         const query = category ? { category } : {}; // Adjust query based on the presence of category
-        const events = await Event.find(query);
+        const events = await Event.find(query).populate('detailedEventId');
         response.status(200).json(events);
     } catch (error) {
         console.error('Error fetching events:', error);
@@ -64,6 +79,7 @@ app.get('/req-event', async function (request, response) {
         });
     }
 });
+
 
 app.post('/add-eventdes', async function (request, response) {
     try {

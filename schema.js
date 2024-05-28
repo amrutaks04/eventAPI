@@ -16,7 +16,8 @@ const eventSchema = new mongoose.Schema({
   imageUrl: String,
   detailedEventId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Eventdes', // Reference to the Eventdes model
+    ref: 'Eventdes',
+    required: true, 
   },
 });
 
