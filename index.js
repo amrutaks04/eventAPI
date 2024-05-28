@@ -96,28 +96,40 @@ app.post('/add-eventdes', async function (request, response) {
 app.get('/eventdes/:id', async function (request, response) {
     try {
         const id = request.params.id.trim(); 
-        console.log(`Fetching event description with ID: ${id}`); 
+        console.log(`Fetching event description for Event with ID: ${id}`); 
         
         // Check if the ID is valid ObjectId
         if (!mongoose.Types.ObjectId.isValid(id)) {
             console.error(`Invalid ObjectId: ${id}`);
             return response.status(400).json({
                 status: 'failure',
-                message: 'Invalid Event Description ID'
+                message: 'Invalid Event ID'
             });
         }
 
-        const eventDes = await Eventdes.findById(id);
+        // Find the Event document by the provided ID
+        const event = await Event.findById(id);
+        if (!event) {
+            console.log(`Event with ID ${id} not found`); 
+            return response.status(404).json({
+                status: 'failure',
+                message: 'Event not found'
+            });
+        }
+
+        // Use the detailedEventId to find the corresponding Eventdes document
+        const eventDes = await Eventdes.findById(event.detailedEventId);
         if (!eventDes) {
-            console.log(`Event description with ID ${id} not found`); 
+            console.log(`Event description with ID ${event.detailedEventId} not found`); 
             return response.status(404).json({
                 status: 'failure',
                 message: 'Event description not found'
             });
         }
+
         response.status(200).json(eventDes);
     } catch (error) {
-        console.error(`Error fetching event description with ID ${id}:`, error);
+        console.error(`Error fetching event description for Event ID ${id}:`, error);
         response.status(500).json({
             status: 'failure',
             message: 'Failed to fetch event description',
@@ -125,7 +137,6 @@ app.get('/eventdes/:id', async function (request, response) {
         });
     }
 });
-
 
 
 module.exports = app;
