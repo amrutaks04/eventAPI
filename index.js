@@ -144,9 +144,9 @@ app.get('/eventdes/:id', async function (request, response) {
 });
 
 app.post('/cart', (req, res) => {
-    const { image, title,date,category } = req.body;
+    const { image, title,date,category,imageUrl } = req.body;
 
-    const newCartItem = new Cart({ image, title,date,category } );
+    const newCartItem = new Cart({ image, title,date,category,imageUrl } );
 
     newCartItem.save()
         .then(item => res.status(201).json(item))
