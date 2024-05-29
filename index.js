@@ -152,16 +152,14 @@ app.post('/cart', (req, res) => {
         .then(item => res.status(201).json(item))
         .catch(err => res.status(500).json({ error: err.message }));
 });
-
 app.get('/getcart', async (req, res) => {
-
     try {
-        const {username}=req.query;
-        const carts = await Cart.find({username:username});
+        const carts = await Cart.find(); 
         res.json(carts);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
+
 
 module.exports = app;
