@@ -2,8 +2,10 @@ const mongoose = require('mongoose');
 const express = require('express');
 const Event = require('./schema.js');
 const Eventdes = require('./schemaEvent.js');
+const Cart=require('./myevents.js')
 const bodyParser = require('body-parser');
 const cors = require('cors');
+
 
 const app = express();
 app.use(bodyParser.json());
@@ -141,6 +143,25 @@ app.get('/eventdes/:id', async function (request, response) {
     }
 });
 
+app.post('/cart', (req, res) => {
+    const { username , image, topic, description, price } = req.body;
 
+    const newCartItem = new Cart({username, image, topic, description, price });
+
+    newCartItem.save()
+        .then(item => res.status(201).json(item))
+        .catch(err => res.status(500).json({ error: err.message }));
+});
+
+app.get('/getcart', async (req, res) => {
+
+    try {
+        const {username}=req.query;
+        const carts = await Cart.find({username:username});
+        res.json(carts);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 module.exports = app;
