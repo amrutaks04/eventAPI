@@ -144,17 +144,28 @@ app.get('/eventdes/:id', async function (request, response) {
 });
 
 app.post('/cart', (req, res) => {
-    const { image, topic, description, price } = req.body;
+    const { image, title,date,category } = req.body;
 
-    const newCartItem = new Cart({image, topic, description, price });
+    const newCartItem = new Cart({ image, title,date,category } );
 
     newCartItem.save()
         .then(item => res.status(201).json(item))
         .catch(err => res.status(500).json({ error: err.message }));
 });
+
+// app.get('/getcart', async (req, res) => {
+
+//     try {
+//         const {username}=req.query;
+//         const carts = await Cart.find({username:username});
+//         res.json(carts);
+//     } catch (err) {
+//         res.status(500).json({ error: err.message });
+//     }
+// });
 app.get('/getcart', async (req, res) => {
     try {
-        const carts = await Cart.find(); 
+        const carts = await Cart.find(); // This will fetch all cart items
         res.json(carts);
     } catch (err) {
         res.status(500).json({ error: err.message });
