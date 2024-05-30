@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const myEvent = new mongoose.Schema({
+  username: {
+    type: String,
+    required: true,
+  },
   title: {
     type: String,
     required: true,
@@ -16,6 +20,6 @@ const myEvent = new mongoose.Schema({
   imageUrl: String,
 });
 
-const Cart = mongoose.model('Cart',myEvent);
+const Cart = mongoose.model('Cart', myEvent);
 
 module.exports = Cart;

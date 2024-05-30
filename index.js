@@ -143,29 +143,42 @@ app.get('/eventdes/:id', async function (request, response) {
     }
 });
 
-app.post('/cart', (req, res) => {
-    const { image, title,date,category,imageUrl } = req.body;
+// app.post('/cart', (req, res) => {
+//     const { image, title,date,category,imageUrl } = req.body;
 
-    const newCartItem = new Cart({ image, title,date,category,imageUrl } );
+//     const newCartItem = new Cart({ image, title,date,category,imageUrl } );
+
+//     newCartItem.save()
+//         .then(item => res.status(201).json(item))
+//         .catch(err => res.status(500).json({ error: err.message }));
+// });
+
+// app.get('/getcart', async (req, res) => {
+//     try {
+//         const carts = await Cart.find(); 
+//         res.json(carts);
+//     } catch (err) {
+//         res.status(500).json({ error: err.message });
+//     }
+// });
+app.post('/cart', (req, res) => {
+    const { username, image, title, date, category, imageUrl } = req.body;
+
+    const newCartItem = new Cart({ username, image, title, date, category, imageUrl });
 
     newCartItem.save()
         .then(item => res.status(201).json(item))
         .catch(err => res.status(500).json({ error: err.message }));
 });
 
-// app.get('/getcart', async (req, res) => {
-
-//     try {
-//         const {username}=req.query;
-//         const carts = await Cart.find({username:username});
-//         res.json(carts);
-//     } catch (err) {
-//         res.status(500).json({ error: err.message });
-//     }
-// });
 app.get('/getcart', async (req, res) => {
     try {
-        const carts = await Cart.find(); // This will fetch all cart items
+        const { username } = req.query;
+        if (!username) {
+            return res.status(400).json({ error: 'Username is required' });
+        }
+
+        const carts = await Cart.find({ username });
         res.json(carts);
     } catch (err) {
         res.status(500).json({ error: err.message });
