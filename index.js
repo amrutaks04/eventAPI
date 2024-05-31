@@ -3,6 +3,7 @@ const express = require('express');
 const Event = require('./schema.js');
 const Eventdes = require('./schemaEvent.js');
 const Cart=require('./myevents.js')
+const UserEvent=require('./userEventSchema')
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
@@ -51,21 +52,6 @@ app.post('/add-event', async function (request, response) {
     }
 });
 
-// app.get('/req-event', async function (request, response) {
-//     try {
-//         const { category } = request.query;
-//         const query = category ? { category } : {};
-//         const events = await Event.find(query);
-//         response.status(200).json(events);
-//     } catch (error) {
-//         console.error('Error fetching events:', error);
-//         response.status(500).json({
-//             status: 'failure',
-//             message: 'Failed to fetch events',
-//             error: error.message
-//         });
-//     }
-// });
 app.get('/req-event', async function (request, response) {
     try {
         const { category } = request.query;
@@ -142,25 +128,6 @@ app.get('/eventdes/:id', async function (request, response) {
         });
     }
 });
-
-// app.post('/cart', (req, res) => {
-//     const { image, title,date,category,imageUrl } = req.body;
-
-//     const newCartItem = new Cart({ image, title,date,category,imageUrl } );
-
-//     newCartItem.save()
-//         .then(item => res.status(201).json(item))
-//         .catch(err => res.status(500).json({ error: err.message }));
-// });
-
-// app.get('/getcart', async (req, res) => {
-//     try {
-//         const carts = await Cart.find(); 
-//         res.json(carts);
-//     } catch (err) {
-//         res.status(500).json({ error: err.message });
-//     }
-// });
 app.post('/cart', (req, res) => {
     const { username, image, title, date, category, imageUrl } = req.body;
 
@@ -184,6 +151,27 @@ app.get('/getcart', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
+app.post('/add-user-event', async (req, res) => {
+    try {
+      const newUserEvent = await UserEvent.create(req.body);
+      res.status(201).json(newUserEvent);
+    } catch (error) {
+      console.error('Error creating user event:', error);
+      res.status(500).json({ error: 'Failed to create user event' });
+    }
+  });
+
+  app.get('/user-events/:username', async (req, res) => {
+    try {
+      const { username } = req.params;
+      const userEvents = await UserEvent.find({ username });
+      res.json(userEvents);
+    } catch (error) {
+      console.error('Error fetching user events:', error);
+      res.status(500).json({ error: 'Failed to fetch user events' });
+    }
+  });
 
 
 module.exports = app;
