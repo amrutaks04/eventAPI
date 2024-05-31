@@ -3,7 +3,7 @@ const express = require('express');
 const Event = require('./schema.js');
 const Eventdes = require('./schemaEvent.js');
 const Cart=require('./myevents.js')
-const UserEvent=require('./userEventSchema')
+const UserEvent=require('./schemaUserEvent.js')
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
