@@ -3,8 +3,6 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const multer = require('multer');
-const fs = require('fs');
-const path = require('path');
 const Event = require('./schema.js');
 const Eventdes = require('./schemaEvent.js');
 const Cart = require('./myevents.js');
@@ -15,6 +13,8 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // Ensure the uploads directory exists
+const fs = require('fs');
+const path = require('path');
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir);
@@ -182,7 +182,5 @@ app.post('/add-user-event', upload.single('image'), async (req, res) => {
     res.status(500).json({ error: 'Failed to create user event' });
   }
 });
-
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 module.exports = app;
