@@ -183,4 +183,20 @@ app.post('/add-user-event', upload.single('image'), async (req, res) => {
   }
 });
 
+app.get('/user-events', async (req, res) => {
+  try {
+      const { username } = req.query;
+      if (!username) {
+          return res.status(400).json({ error: 'Username is required' });
+      }
+
+      // Fetch events for the given username
+      const userEvents = await UserEvent.find({ username });
+      res.json(userEvents);
+  } catch (err) {
+      res.status(500).json({ error: err.message });
+  }
+});
+
+
 module.exports = app;
