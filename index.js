@@ -8,10 +8,18 @@ const Eventdes = require('./schemaEvent.js');
 const Cart = require('./myevents.js');
 const UserEvent = require('./schemaUserEvent.js');
 
-
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
+
+// Ensure the uploads directory exists
+const fs = require('fs');
+const path = require('path');
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+}
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'uploads/');
@@ -139,6 +147,7 @@ app.get('/eventdes/:id', async function (request, response) {
         });
     }
 });
+
 app.post('/cart', (req, res) => {
     const { username, image, title, date, category, imageUrl } = req.body;
 
