@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const multer = require('multer');
-const path = require('path');
 const Event = require('./schema.js');
 const Eventdes = require('./schemaEvent.js');
 const Cart = require('./myevents.js');
