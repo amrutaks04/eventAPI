@@ -152,15 +152,28 @@ app.get('/getcart', async (req, res) => {
     }
 });
 
+// app.post('/add-user-event', async (req, res) => {
+//     try {
+//       const newUserEvent = await UserEvent.create(req.body);
+//       res.status(201).json(newUserEvent);
+//     } catch (error) {
+//       console.error('Error creating user event:', error);
+//       res.status(500).json({ error: 'Failed to create user event' });
+//     }
+//   });
+
 app.post('/add-user-event', async (req, res) => {
-    try {
-      const newUserEvent = await UserEvent.create(req.body);
-      res.status(201).json(newUserEvent);
-    } catch (error) {
-      console.error('Error creating user event:', error);
-      res.status(500).json({ error: 'Failed to create user event' });
-    }
-  });
+  try {
+    console.log('Received data:', req.body);
+
+    const newUserEvent = await UserEvent.create(req.body);
+    res.status(201).json(newUserEvent);
+  } catch (error) {
+    console.error('Error creating user event:', error);
+    res.status(500).json({ error: 'Failed to create user event' });
+  }
+});
+
 
   app.get('/user-events/:username', async (req, res) => {
     try {
