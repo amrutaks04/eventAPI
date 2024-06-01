@@ -1,16 +1,27 @@
-const mongoose = require('mongoose');
 const express = require('express');
-const Event = require('./schema.js');
-const Eventdes = require('./schemaEvent.js');
-const Cart=require('./myevents.js')
-const UserEvent=require('./schemaUserEvent.js')
+const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const multer = require('multer');
+const Event = require('./schema.js');
+const Eventdes = require('./schemaEvent.js');
+const Cart = require('./myevents.js');
+const UserEvent = require('./schemaUserEvent.js');
 
 
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + file.originalname);
+  },
+});
+
+const upload = multer({ storage });
 
 async function connectToDb() {
     try {
@@ -152,39 +163,15 @@ app.get('/getcart', async (req, res) => {
     }
 });
 
-// app.post('/add-user-event', async (req, res) => {
-//     try {
-//       const newUserEvent = await UserEvent.create(req.body);
-//       res.status(201).json(newUserEvent);
-//     } catch (error) {
-//       console.error('Error creating user event:', error);
-//       res.status(500).json({ error: 'Failed to create user event' });
-//     }
-//   });
-
-app.post('/add-user-event', async (req, res) => {
+app.post('/add-user-event', upload.single('image'), async (req, res) => {
   try {
-    console.log('Received data:', req.body);
-
-    const newUserEvent = await UserEvent.create(req.body);
+    const imageUrl = req.file ? `/uploads/${req.file.filename}` : '';
+    const newUserEvent = await UserEvent.create({ ...req.body, imageUrl });
     res.status(201).json(newUserEvent);
   } catch (error) {
     console.error('Error creating user event:', error);
     res.status(500).json({ error: 'Failed to create user event' });
   }
 });
-
-
-  app.get('/user-events/:username', async (req, res) => {
-    try {
-      const { username } = req.params;
-      const userEvents = await UserEvent.find({ username });
-      res.json(userEvents);
-    } catch (error) {
-      console.error('Error fetching user events:', error);
-      res.status(500).json({ error: 'Failed to fetch user events' });
-    }
-  });
-
 
 module.exports = app;
