@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const multer = require('multer');
+const path = require('path');
 const Event = require('./schema.js');
 const Eventdes = require('./schemaEvent.js');
 const Cart = require('./myevents.js');
@@ -30,7 +31,7 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
-
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 async function connectToDb() {
     try {
         await mongoose.connect('mongodb+srv://amruta:vieFC9VXxVSgoPzM@cluster0.rgbuaxs.mongodb.net/EventManagement?retryWrites=true&w=majority&appName=Cluster0');
