@@ -3,9 +3,6 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const multer = require('multer');
-const Event = require('./schema.js');
-const Eventdes = require('./schemaEvent.js');
-const Cart = require('./myevents.js');
 const UserEvent = require('./schemaUserEvent.js');
 
 const app = express();
@@ -31,6 +28,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 async function connectToDb() {
     try {
         await mongoose.connect('mongodb+srv://amruta:vieFC9VXxVSgoPzM@cluster0.rgbuaxs.mongodb.net/EventManagement?retryWrites=true&w=majority&appName=Cluster0');
@@ -195,22 +193,6 @@ app.get('/user-events', async (req, res) => {
       res.status(500).json({ error: err.message });
   }
 });
-
-
-// app.put('/user-events/:id', async (req, res) => {
-//     try {
-//       const { id } = req.params;
-//       const updatedEvent = req.body;
-//       const event = await UserEvent.findByIdAndUpdate(id, updatedEvent, { new: true });
-//       if (!event) {
-//         return res.status(404).json({ error: 'Event not found' });
-//       }
-//       res.status(200).json(event);
-//     } catch (error) {
-//       console.error('Error updating event:', error);
-//       res.status(500).json({ error: 'Failed to update event' });
-//     }
-//   });
   
 app.put('/user-events/:id', upload.single('imageUrl'), async (req, res) => {
     try {
@@ -242,6 +224,20 @@ app.put('/user-events/:id', upload.single('imageUrl'), async (req, res) => {
         res.json(userEvents);
     } catch (err) {
         res.status(500).json({ error: err.message });
+    }
+  });
+
+app.delete('/user-events/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const deletedEvent = await UserEvent.findByIdAndDelete(id);
+      if (!deletedEvent) {
+        return res.status(404).json({ error: 'Event not found' });
+      }
+      res.status(200).json({ message: 'Event deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      res.status(500).json({ error: 'Failed to delete event' });
     }
   });
   
