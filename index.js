@@ -31,6 +31,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 async function connectToDb() {
     try {
         await mongoose.connect('mongodb+srv://amruta:vieFC9VXxVSgoPzM@cluster0.rgbuaxs.mongodb.net/EventManagement?retryWrites=true&w=majority&appName=Cluster0');
@@ -86,7 +87,6 @@ app.get('/req-event', async function (request, response) {
         });
     }
 });
-
 
 app.post('/add-eventdes', async function (request, response) {
     try {
@@ -183,12 +183,40 @@ app.post('/add-user-event', upload.single('image'), async (req, res) => {
   }
 });
 
+app.put('/user-events/:id', upload.single('image'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const event = await UserEvent.findById(id);
+
+    if (!event) {
+      return res.status(404).json({ error: 'Event not found' });
+    }
+
+    if (req.file) {
+      event.imageUrl = `/uploads/${req.file.filename}`;
+    }
+
+    Object.keys(req.body).forEach(key => {
+      if (key !== 'image') {
+        event[key] = req.body[key];
+      }
+    });
+
+    await event.save();
+    res.status(200).json(event);
+  } catch (error) {
+    console.error('Error updating event:', error);
+    res.status(500).json({ error: 'Failed to update event' });
+  }
+});
+
 app.get('/user-events', async (req, res) => {
   try {
       const { username } = req.query;
       if (!username) {
           return res.status(400).json({ error: 'Username is required' });
       }
+
       const userEvents = await UserEvent.find({ username });
       res.json(userEvents);
   } catch (err) {
@@ -196,39 +224,4 @@ app.get('/user-events', async (req, res) => {
   }
 });
 
-
-// app.put('/user-events/:id', async (req, res) => {
-//     try {
-//       const { id } = req.params;
-//       const updatedEvent = req.body;
-//       const event = await UserEvent.findByIdAndUpdate(id, updatedEvent, { new: true });
-//       if (!event) {
-//         return res.status(404).json({ error: 'Event not found' });
-//       }
-//       res.status(200).json(event);
-//     } catch (error) {
-//       console.error('Error updating event:', error);
-//       res.status(500).json({ error: 'Failed to update event' });
-//     }
-//   });
-  
-// Update user event with image
-app.put('/user-events/:id', upload.single('image'), async (req, res) => {
-    try {
-      const { id } = req.params;
-      const updatedEvent = req.body;
-      if (req.file) {
-        updatedEvent.imageUrl = `/uploads/${req.file.filename}`;
-      }
-      const event = await UserEvent.findByIdAndUpdate(id, updatedEvent, { new: true });
-      if (!event) {
-        return res.status(404).json({ error: 'Event not found' });
-      }
-      res.status(200).json(event);
-    } catch (error) {
-      console.error('Error updating event:', error);
-      res.status(500).json({ error: 'Failed to update event' });
-    }
-  });
-  
 module.exports = app;
