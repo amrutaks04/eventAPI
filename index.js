@@ -9,7 +9,6 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-// Ensure the uploads directory exists
 const fs = require('fs');
 const path = require('path');
 const uploadDir = path.join(__dirname, 'uploads');
