@@ -198,5 +198,21 @@ app.get('/user-events', async (req, res) => {
   }
 });
 
+// Update user event
+app.put('/user-events/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updatedEvent = req.body;
+      const event = await UserEvent.findByIdAndUpdate(id, updatedEvent, { new: true });
+      if (!event) {
+        return res.status(404).json({ error: 'Event not found' });
+      }
+      res.status(200).json(event);
+    } catch (error) {
+      console.error('Error updating event:', error);
+      res.status(500).json({ error: 'Failed to update event' });
+    }
+  });
+  
 
 module.exports = app;
