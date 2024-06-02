@@ -212,7 +212,7 @@ app.get('/user-events', async (req, res) => {
 //     }
 //   });
   
-app.put('/user-events/:id', upload.single('image'), async (req, res) => {
+app.put('/user-events/:id', upload.single('imageUrl'), async (req, res) => {
     try {
       const { id } = req.params;
       const updatedEvent = req.body;
