@@ -183,46 +183,61 @@ app.post('/add-user-event', upload.single('image'), async (req, res) => {
   }
 });
 
-app.patch('/user-events/:id', upload.single('image'), async (req, res) => {
-  try {
-    const { id } = req.params;
-    const event = await UserEvent.findById(id);
-
-    if (!event) {
-      return res.status(404).json({ error: 'Event not found' });
-    }
-
-    // Update event fields based on request body
-    for (const key in req.body) {
-      event[key] = req.body[key];
-    }
-
-    // Update event image if a new image was uploaded
-    if (req.file) {
-      event.imageUrl = `/uploads/${req.file.filename}`;
-    }
-
-    // Save the updated event to the database
-    await event.save();
-
-    // Respond with the updated event data
-    res.status(200).json(event);
-  } catch (error) {
-    console.error('Error updating event:', error);
-    res.status(500).json({ error: 'Failed to update event' });
-  }
-});
-app.get('/user-events', async (req, res) => {
+app.put('/user-events/:id', upload.single('image'), async (req, res) => {
     try {
-        const { username } = req.query;
-        if (!username) {
-            return res.status(400).json({ error: 'Username is required' });
+      const { id } = req.params;
+      const event = await UserEvent.findById(id);
+  
+      if (!event) {
+        return res.status(404).json({ error: 'Event not found' });
+      }
+  
+      // Check if a new image file was uploaded
+      if (req.file) {
+        // Construct the new imageUrl
+        const newImageUrl = `/uploads/${req.file.filename}`;
+        
+        // Remove the previous image file if it exists
+        if (event.imageUrl) {
+          // Delete the previous image file from the server
+          const previousImagePath = path.join(__dirname, event.imageUrl);
+          fs.unlinkSync(previousImagePath);
         }
   
-        const userEvents = await UserEvent.find({ username });
-        res.json(userEvents);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
+        // Update the imageUrl with the new path
+        event.imageUrl = newImageUrl;
+      }
+  
+      // Update other fields if necessary
+      // Example:
+      // event.title = req.body.title;
+      // event.description = req.body.description;
+      // ...
+  
+      // Save the updated event
+      await event.save();
+  
+      // Respond with the updated event
+      res.status(200).json(event);
+    } catch (error) {
+      console.error('Error updating event:', error);
+      res.status(500).json({ error: 'Failed to update event' });
+    }
+  });
+  
+  // GET route to fetch user events
+  app.get('/user-events', async (req, res) => {
+    try {
+      const { username } = req.query;
+      if (!username) {
+          return res.status(400).json({ error: 'Username is required' });
+      }
+  
+      const userEvents = await UserEvent.find({ username });
+      res.json(userEvents);
+    } catch (error) {
+      console.error('Error fetching user events:', error);
+      res.status(500).json({ error: 'Failed to fetch user events' });
     }
   });
   
