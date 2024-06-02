@@ -189,8 +189,6 @@ app.get('/user-events', async (req, res) => {
       if (!username) {
           return res.status(400).json({ error: 'Username is required' });
       }
-
-      // Fetch events for the given username
       const userEvents = await UserEvent.find({ username });
       res.json(userEvents);
   } catch (err) {
@@ -198,11 +196,30 @@ app.get('/user-events', async (req, res) => {
   }
 });
 
-// Update user event
-app.put('/user-events/:id', async (req, res) => {
+
+// app.put('/user-events/:id', async (req, res) => {
+//     try {
+//       const { id } = req.params;
+//       const updatedEvent = req.body;
+//       const event = await UserEvent.findByIdAndUpdate(id, updatedEvent, { new: true });
+//       if (!event) {
+//         return res.status(404).json({ error: 'Event not found' });
+//       }
+//       res.status(200).json(event);
+//     } catch (error) {
+//       console.error('Error updating event:', error);
+//       res.status(500).json({ error: 'Failed to update event' });
+//     }
+//   });
+  
+// Update user event with image
+app.put('/user-events/:id', upload.single('image'), async (req, res) => {
     try {
       const { id } = req.params;
       const updatedEvent = req.body;
+      if (req.file) {
+        updatedEvent.imageUrl = `/uploads/${req.file.filename}`;
+      }
       const event = await UserEvent.findByIdAndUpdate(id, updatedEvent, { new: true });
       if (!event) {
         return res.status(404).json({ error: 'Event not found' });
@@ -214,5 +231,4 @@ app.put('/user-events/:id', async (req, res) => {
     }
   });
   
-
 module.exports = app;
