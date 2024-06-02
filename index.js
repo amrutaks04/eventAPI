@@ -183,7 +183,7 @@ app.post('/add-user-event', upload.single('image'), async (req, res) => {
   }
 });
 
-app.put('/user-events/:id', upload.single('image'), async (req, res) => {
+app.patch('/user-events/:id', upload.single('image'), async (req, res) => {
   try {
     const { id } = req.params;
     const event = await UserEvent.findById(id);
@@ -192,36 +192,39 @@ app.put('/user-events/:id', upload.single('image'), async (req, res) => {
       return res.status(404).json({ error: 'Event not found' });
     }
 
+    // Update event fields based on request body
+    for (const key in req.body) {
+      event[key] = req.body[key];
+    }
+
+    // Update event image if a new image was uploaded
     if (req.file) {
       event.imageUrl = `/uploads/${req.file.filename}`;
     }
 
-    Object.keys(req.body).forEach(key => {
-      if (key !== 'image') {
-        event[key] = req.body[key];
-      }
-    });
-
+    // Save the updated event to the database
     await event.save();
+
+    // Respond with the updated event data
     res.status(200).json(event);
   } catch (error) {
     console.error('Error updating event:', error);
     res.status(500).json({ error: 'Failed to update event' });
   }
 });
-
 app.get('/user-events', async (req, res) => {
-  try {
-      const { username } = req.query;
-      if (!username) {
-          return res.status(400).json({ error: 'Username is required' });
-      }
-
-      const userEvents = await UserEvent.find({ username });
-      res.json(userEvents);
-  } catch (err) {
-      res.status(500).json({ error: err.message });
-  }
-});
-
-module.exports = app;
+    try {
+        const { username } = req.query;
+        if (!username) {
+            return res.status(400).json({ error: 'Username is required' });
+        }
+  
+        const userEvents = await UserEvent.find({ username });
+        res.json(userEvents);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+  });
+  
+  module.exports = app;
+  
