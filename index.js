@@ -18,19 +18,20 @@ app.use(cors());
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
-   
 }
 
 // Configure multer storage
 const storage = multer.diskStorage({
-    destination: './uploads',
+    destination: (req, file, cb) => {
+        cb(null, uploadDir);
+    },
     filename: (req, file, cb) => {
         cb(null, `${file.fieldname}_${Date.now()}_${file.originalname}`);
     }
 });
 
 const upload = multer({ storage });
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(uploadDir));
 
 async function connectToDb() {
     try {
@@ -41,7 +42,7 @@ async function connectToDb() {
             console.log(`Listening on port ${port}`);
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         console.log("Couldn't establish connection");
     }
 }
