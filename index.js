@@ -174,7 +174,7 @@ app.get('/getcart', async (req, res) => {
     }
 });
 
-app.post('/add-user-event', upload.single('imageUrl'), async (req, res) => {
+app.post('/add-user-event', upload.single('image'), async (req, res) => {
     try {
         if (req.file) {
             console.log('File received:', req.file);
