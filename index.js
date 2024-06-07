@@ -18,7 +18,7 @@ app.use(cors());
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
-    fs.chmodSync(uploadDir, '755'); // Set correct permissions
+   
 }
 
 // Configure multer storage
