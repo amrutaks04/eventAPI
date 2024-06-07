@@ -20,7 +20,6 @@ if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Configure multer storage
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, uploadDir);
@@ -174,6 +173,7 @@ app.get('/getcart', async (req, res) => {
     }
 });
 
+
 app.post('/add-user-event', upload.single('image'), async (req, res) => {
     try {
         if (req.file) {
@@ -182,8 +182,8 @@ app.post('/add-user-event', upload.single('image'), async (req, res) => {
             console.log('No file received.');
         }
 
-        const imageUrl = req.file ? `/uploads/${req.file.filename}` : '';
-        const newUserEvent = await UserEvent.create({ ...req.body, imageUrl });
+        const imageUrl = req.file? `/uploads/${req.file.filename}` : '';
+        const newUserEvent = await UserEvent.create({...req.body, imageUrl });
         res.status(201).json(newUserEvent);
     } catch (error) {
         console.error('Error creating user event:', error);
