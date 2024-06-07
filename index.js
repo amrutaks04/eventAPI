@@ -14,20 +14,19 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-// Ensure the 'uploads' directory exists
+// Ensure the 'uploads' directory exists and has the correct permissions
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir);
+    fs.mkdirSync(uploadDir, { recursive: true });
+    fs.chmodSync(uploadDir, '755'); // Set correct permissions
 }
 
 // Configure multer storage
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);
-  },
+    destination: './uploads',
+    filename: (req, file, cb) => {
+        cb(null, `${file.fieldname}_${Date.now()}_${file.originalname}`);
+    }
 });
 
 const upload = multer({ storage });
