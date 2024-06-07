@@ -32,6 +32,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 app.use('/uploads', express.static(uploadDir));
 
+
 async function connectToDb() {
     try {
         await mongoose.connect('mongodb+srv://amruta:vieFC9VXxVSgoPzM@cluster0.rgbuaxs.mongodb.net/EventManagement?retryWrites=true&w=majority&appName=Cluster0');
@@ -182,8 +183,9 @@ app.post('/add-user-event', upload.single('image'), async (req, res) => {
             console.log('No file received.');
         }
 
-        const imageUrl = req.file? `/uploads/${req.file.filename}` : '';
-        const newUserEvent = await UserEvent.create({...req.body, imageUrl });
+        // Remove the leading slash from the file path
+        const adjustedImageUrl = req.file? `/uploads/${req.file.filename}` : '';
+        const newUserEvent = await UserEvent.create({...req.body, imageUrl: adjustedImageUrl });
         res.status(201).json(newUserEvent);
     } catch (error) {
         console.error('Error creating user event:', error);
