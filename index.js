@@ -9,7 +9,6 @@ const Eventdes = require('./schemaEvent.js');
 const Cart = require('./myevents.js');
 const fs = require('fs');
 const path = require('path');
-const upload = require('./upload');
 
 const app = express();
 app.use(bodyParser.json());
@@ -31,6 +30,27 @@ async function connectToDb() {
 }
 
 connectToDb();
+
+// Ensure the 'uploads' directory exists and has the correct permissions
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+    console.log('Uploads directory created');
+} else {
+    console.log('Uploads directory already exists');
+}
+
+// Multer storage configuration
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+        cb(null, `${Date.now()}_${file.originalname}`);
+    }
+});
+
+const upload = multer({ storage });
 
 // Create event endpoint
 app.post('/add-event', async (req, res) => {
