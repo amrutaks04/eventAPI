@@ -20,6 +20,7 @@ if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
 
+// Multer storage configuration
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, uploadDir);
@@ -32,13 +33,13 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 app.use('/uploads', express.static(uploadDir));
 
-
+// Connect to MongoDB
 async function connectToDb() {
     try {
-        await mongoose.connect('mongodb+srv://amruta:vieFC9VXxVSgoPzM@cluster0.rgbuaxs.mongodb.net/EventManagement?retryWrites=true&w=majority&appName=Cluster0');
+        await mongoose.connect('mongodb+srv://amruta:vieFC9VXxVSgoPzM@cluster0.rgbuaxs.mongodb.net/EventManagement?retryWrites=true&w=majority&appName=Cluster0', { useNewUrlParser: true, useUnifiedTopology: true });
         console.log('DB Connection established');
         const port = process.env.PORT || 8002;
-        app.listen(port, function() {
+        app.listen(port, () => {
             console.log(`Listening on port ${port}`);
         });
     } catch (error) {
@@ -49,15 +50,10 @@ async function connectToDb() {
 
 connectToDb();
 
+// Create event endpoint
 app.post('/add-event', async (req, res) => {
     try {
-        const newEvent = await Event.create({
-            title: req.body.title,
-            category: req.body.category,
-            date: req.body.date,
-            imageUrl: req.body.imageUrl,
-            detailedEventId: req.body.detailedEventId 
-        });
+        const newEvent = await Event.create(req.body);
         res.status(201).json({
             status: 'success',
             message: 'Event created successfully',
@@ -73,6 +69,7 @@ app.post('/add-event', async (req, res) => {
     }
 });
 
+// Fetch events endpoint
 app.get('/req-event', async (req, res) => {
     try {
         const { category } = req.query;
@@ -89,19 +86,10 @@ app.get('/req-event', async (req, res) => {
     }
 });
 
+// Create event description endpoint
 app.post('/add-eventdes', async (req, res) => {
     try {
-        const newEventDes = await Eventdes.create({
-            title: req.body.title,
-            category: req.body.category,
-            date: req.body.date,
-            imageUrl: req.body.imageUrl,
-            about: req.body.about,
-            termsAndConditions: req.body.termsAndConditions,
-            mode: req.body.mode,
-            time: req.body.time,
-            location: req.body.location
-        });
+        const newEventDes = await Eventdes.create(req.body);
         res.status(201).json({
             status: 'success',
             message: 'Event Description added successfully',
@@ -117,6 +105,7 @@ app.post('/add-eventdes', async (req, res) => {
     }
 });
 
+// Fetch event description by ID endpoint
 app.get('/eventdes/:id', async (req, res) => {
     try {
         const id = req.params.id.trim(); 
@@ -149,10 +138,10 @@ app.get('/eventdes/:id', async (req, res) => {
     }
 });
 
+// Add item to cart endpoint
 app.post('/cart', async (req, res) => {
     try {
-        const { username, image, title, date, category, imageUrl } = req.body;
-        const newCartItem = await Cart.create({ username, image, title, date, category, imageUrl });
+        const newCartItem = await Cart.create(req.body);
         res.status(201).json(newCartItem);
     } catch (error) {
         console.error('Error adding to cart:', error);
@@ -160,6 +149,7 @@ app.post('/cart', async (req, res) => {
     }
 });
 
+// Fetch cart items endpoint
 app.get('/getcart', async (req, res) => {
     try {
         const { username } = req.query;
@@ -174,18 +164,14 @@ app.get('/getcart', async (req, res) => {
     }
 });
 
-
+// Create user event endpoint with file upload
 app.post('/add-user-event', upload.single('image'), async (req, res) => {
     try {
-        if (req.file) {
-            console.log('File received:', req.file);
-        } else {
-            console.log('No file received.');
-        }
-
-        // Remove the leading slash from the file path
-        const adjustedImageUrl = req.file? `/uploads/${req.file.filename}` : '';
-        const newUserEvent = await UserEvent.create({...req.body, imageUrl: adjustedImageUrl });
+        const fileUrl = req.file ? `/uploads/${req.file.filename}` : '';
+        const newUserEvent = await UserEvent.create({
+            ...req.body,
+            imageUrl: fileUrl
+        });
         res.status(201).json(newUserEvent);
     } catch (error) {
         console.error('Error creating user event:', error);
@@ -193,6 +179,7 @@ app.post('/add-user-event', upload.single('image'), async (req, res) => {
     }
 });
 
+// Fetch user events endpoint
 app.get('/user-events', async (req, res) => {
     try {
         const { username } = req.query;
@@ -207,12 +194,12 @@ app.get('/user-events', async (req, res) => {
     }
 });
 
-app.put('/user-events/:id', upload.single('imageUrl'), async (req, res) => {
+// Update user event endpoint with file upload
+app.put('/user-events/:id', upload.single('image'), async (req, res) => {
     try {
         const { id } = req.params;
         const updatedEvent = req.body;
         if (req.file) {
-            console.log('Updating file:', req.file);
             updatedEvent.imageUrl = `/uploads/${req.file.filename}`;
         }
         const event = await UserEvent.findByIdAndUpdate(id, updatedEvent, { new: true });
@@ -226,6 +213,7 @@ app.put('/user-events/:id', upload.single('imageUrl'), async (req, res) => {
     }
 });
 
+// Delete user event endpoint
 app.delete('/user-events/:id', async (req, res) => {
     try {
         const { id } = req.params;
