@@ -14,13 +14,14 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-// Ensure the 'uploads' directory exists and has the correct permissions
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
+    console.log('Uploads directory created');
+} else {
+    console.log('Uploads directory already exists');
 }
 
-// Multer storage configuration
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, uploadDir);
@@ -31,6 +32,7 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
+
 app.use('/uploads', express.static(uploadDir));
 
 // Connect to MongoDB
@@ -164,8 +166,6 @@ app.get('/getcart', async (req, res) => {
     }
 });
 
-
-// Create user event endpoint with file upload
 app.post('/add-user-event', upload.single('image'), async (req, res) => {
     try {
         if (req.file) {
@@ -173,7 +173,7 @@ app.post('/add-user-event', upload.single('image'), async (req, res) => {
         } else {
             console.log('No file received');
         }
-        
+
         const fileUrl = req.file ? `/uploads/${req.file.filename}` : '';
         const newUserEvent = await UserEvent.create({
             ...req.body,
@@ -185,6 +185,7 @@ app.post('/add-user-event', upload.single('image'), async (req, res) => {
         res.status(500).json({ error: 'Failed to create user event' });
     }
 });
+
 
 module.exports = app;
 
