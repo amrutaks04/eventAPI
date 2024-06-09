@@ -36,7 +36,7 @@ app.use('/uploads', express.static(uploadDir));
 // Connect to MongoDB
 async function connectToDb() {
     try {
-        await mongoose.connect('mongodb+srv://amruta:vieFC9VXxVSgoPzM@cluster0.rgbuaxs.mongodb.net/EventManagement?retryWrites=true&w=majority&appName=Cluster0', { useNewUrlParser: true, useUnifiedTopology: true });
+        await mongoose.connect('mongodb+srv://amruta:vieFC9VXxVSgoPzM@cluster0.rgbuaxs.mongodb.net/EventManagement?retryWrites=true&w=majority&appName=Cluster0');
         console.log('DB Connection established');
         const port = process.env.PORT || 8002;
         app.listen(port, () => {
@@ -179,7 +179,6 @@ app.post('/add-user-event', upload.single('image'), async (req, res) => {
     }
 });
 
-// Fetch user events endpoint
 app.get('/user-events', async (req, res) => {
     try {
         const { username } = req.query;
