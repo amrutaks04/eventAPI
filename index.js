@@ -14,48 +14,50 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-// Connect to MongoDB
+// Ensure the 'uploads' directory exists
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+}
+
+// Configure multer storage
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + file.originalname);
+  },
+});
+
+const upload = multer({ storage });
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 async function connectToDb() {
     try {
         await mongoose.connect('mongodb+srv://amruta:vieFC9VXxVSgoPzM@cluster0.rgbuaxs.mongodb.net/EventManagement?retryWrites=true&w=majority&appName=Cluster0');
         console.log('DB Connection established');
         const port = process.env.PORT || 8002;
-        app.listen(port, () => {
+        app.listen(port, function() {
             console.log(`Listening on port ${port}`);
         });
     } catch (error) {
-        console.error(error);
+        console.log(error);
         console.log("Couldn't establish connection");
     }
 }
 
 connectToDb();
 
-// Ensure the 'uploads' directory exists and has the correct permissions
-const uploadDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-    console.log('Uploads directory created');
-} else {
-    console.log('Uploads directory already exists');
-}
-
-// Multer storage configuration
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadDir);
-    },
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}_${file.originalname}`);
-    }
-});
-
-const upload = multer({ storage });
-
-// Create event endpoint
 app.post('/add-event', async (req, res) => {
     try {
-        const newEvent = await Event.create(req.body);
+        const newEvent = await Event.create({
+            title: req.body.title,
+            category: req.body.category,
+            date: req.body.date,
+            imageUrl: req.body.imageUrl,
+            detailedEventId: req.body.detailedEventId 
+        });
         res.status(201).json({
             status: 'success',
             message: 'Event created successfully',
@@ -71,7 +73,6 @@ app.post('/add-event', async (req, res) => {
     }
 });
 
-// Fetch events endpoint
 app.get('/req-event', async (req, res) => {
     try {
         const { category } = req.query;
@@ -88,10 +89,19 @@ app.get('/req-event', async (req, res) => {
     }
 });
 
-// Create event description endpoint
 app.post('/add-eventdes', async (req, res) => {
     try {
-        const newEventDes = await Eventdes.create(req.body);
+        const newEventDes = await Eventdes.create({
+            title: req.body.title,
+            category: req.body.category,
+            date: req.body.date,
+            imageUrl: req.body.imageUrl,
+            about: req.body.about,
+            termsAndConditions: req.body.termsAndConditions,
+            mode: req.body.mode,
+            time: req.body.time,
+            location: req.body.location
+        });
         res.status(201).json({
             status: 'success',
             message: 'Event Description added successfully',
@@ -107,7 +117,6 @@ app.post('/add-eventdes', async (req, res) => {
     }
 });
 
-// Fetch event description by ID endpoint
 app.get('/eventdes/:id', async (req, res) => {
     try {
         const id = req.params.id.trim(); 
@@ -140,10 +149,10 @@ app.get('/eventdes/:id', async (req, res) => {
     }
 });
 
-// Add item to cart endpoint
 app.post('/cart', async (req, res) => {
     try {
-        const newCartItem = await Cart.create(req.body);
+        const { username, image, title, date, category, imageUrl } = req.body;
+        const newCartItem = await Cart.create({ username, image, title, date, category, imageUrl });
         res.status(201).json(newCartItem);
     } catch (error) {
         console.error('Error adding to cart:', error);
@@ -151,7 +160,6 @@ app.post('/cart', async (req, res) => {
     }
 });
 
-// Fetch cart items endpoint
 app.get('/getcart', async (req, res) => {
     try {
         const { username } = req.query;
@@ -169,25 +177,19 @@ app.get('/getcart', async (req, res) => {
 app.post('/add-user-event', upload.single('image'), async (req, res) => {
     try {
         if (req.file) {
-            console.log('File received:', req.file); // Log file details
+            console.log('File received:', req.file);
         } else {
-            console.log('No file received');
+            console.log('No file received.');
         }
 
-        const fileUrl = req.file ? `/uploads/${req.file.filename}` : '';
-        const newUserEvent = await UserEvent.create({
-            ...req.body,
-            imageUrl: fileUrl
-        });
+        const imageUrl = req.file ? `/uploads/${req.file.filename}` : '';
+        const newUserEvent = await UserEvent.create({ ...req.body, imageUrl });
         res.status(201).json(newUserEvent);
     } catch (error) {
         console.error('Error creating user event:', error);
         res.status(500).json({ error: 'Failed to create user event' });
     }
 });
-
-
-module.exports = app;
 
 app.get('/user-events', async (req, res) => {
     try {
@@ -203,12 +205,12 @@ app.get('/user-events', async (req, res) => {
     }
 });
 
-// Update user event endpoint with file upload
-app.put('/user-events/:id', upload.single('image'), async (req, res) => {
+app.put('/user-events/:id', upload.single('imageUrl'), async (req, res) => {
     try {
         const { id } = req.params;
         const updatedEvent = req.body;
         if (req.file) {
+            console.log('Updating file:', req.file);
             updatedEvent.imageUrl = `/uploads/${req.file.filename}`;
         }
         const event = await UserEvent.findByIdAndUpdate(id, updatedEvent, { new: true });
@@ -222,7 +224,6 @@ app.put('/user-events/:id', upload.single('image'), async (req, res) => {
     }
 });
 
-// Delete user event endpoint
 app.delete('/user-events/:id', async (req, res) => {
     try {
         const { id } = req.params;
