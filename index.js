@@ -164,9 +164,16 @@ app.get('/getcart', async (req, res) => {
     }
 });
 
+
 // Create user event endpoint with file upload
 app.post('/add-user-event', upload.single('image'), async (req, res) => {
     try {
+        if (req.file) {
+            console.log('File received:', req.file); // Log file details
+        } else {
+            console.log('No file received');
+        }
+        
         const fileUrl = req.file ? `/uploads/${req.file.filename}` : '';
         const newUserEvent = await UserEvent.create({
             ...req.body,
@@ -178,6 +185,8 @@ app.post('/add-user-event', upload.single('image'), async (req, res) => {
         res.status(500).json({ error: 'Failed to create user event' });
     }
 });
+
+module.exports = app;
 
 app.get('/user-events', async (req, res) => {
     try {
