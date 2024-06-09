@@ -14,7 +14,8 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-const uploadDir = path.join(__dirname, 'uploads');
+const uploadDir = 'E:/eventApi/uploads'; // Update the upload directory path
+
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
     console.log('Uploads directory created');
