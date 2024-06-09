@@ -19,8 +19,8 @@ const eventdesSchema = new mongoose.Schema({
     required: true,
   },
   termsAndConditions: {
-    type: String,
-    required: true,
+    type: [String], 
+    default: [], 
   },
   mode: {
     type: String,
